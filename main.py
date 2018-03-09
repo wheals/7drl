@@ -27,7 +27,7 @@ def process_results(results, game_map, message_log, current_turn):
             time_taken = result.get('time')
         if result.get('exit'):
             exit = result.get('exit')
-        if result.get('message'):\
+        if result.get('message'):
             message_log.add(result.get('message'), current_turn)
         dead = result.get('dead')
         if dead:
