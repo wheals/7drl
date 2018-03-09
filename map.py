@@ -40,6 +40,9 @@ class Map:
     def item_at(self, pos):
         return next((item for item in self.items if item.pos == pos), None)
 
+    def get_active_player(self):
+        return next((actor for actor in self.actors if actor.is_active_player))
+
 
 class MapKnowledge(Map):
     def __init__(self, game_map):

@@ -6,6 +6,7 @@ import libtcodpy as tcod
 
 from map import MAX_MAP_WIDTH, MAX_MAP_HEIGHT
 from messages import MessageLog
+from turnstate import TurnProgress
 
 
 SCREEN_WIDTH = 135
@@ -72,22 +73,24 @@ def render_ui(con, player):
         row += 1
 
 
-def render_messages(con, message_log, current_turn):
+def render_messages(con, message_log, turn_state):
     row = 0
+    current_turn = turn_state.current_turn
     for message, turn in message_log.messages:
-        tcod.console_set_default_foreground(con, tcod.white if turn == current_turn - 1 else tcod.grey)
+        current = turn == current_turn - 1 or turn == current_turn and turn_state.progress is TurnProgress.Ongoing
+        tcod.console_set_default_foreground(con, tcod.white if current else tcod.grey)
         tcod.console_print(con, 0, MAX_MAP_HEIGHT + 1 + row, message)
         row += 1
     tcod.console_set_default_foreground(con, tcod.white)
 
 
-def render_all(map_knowledge, los_map, player, message_log, current_turn):
+def render_all(map_knowledge, los_map, player, message_log, turn_state):
     global console
     tcod.console_clear(console)
 
     render_map(console, map_knowledge, los_map)
     render_ui(console, player)
-    render_messages(console, message_log, current_turn)
+    render_messages(console, message_log, turn_state)
 
     tcod.console_blit(console, 0, 0, tcod.console_get_width(console), tcod.console_get_height(console), 0, 0, 0)
     tcod.console_flush()

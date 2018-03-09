@@ -81,20 +81,20 @@ class Actor:
         if action is ActionType.Describe:
             if self.is_active_player:
                 show_popup(command.item.description(), 'DESCRIBE')
-            return [{'time': 0}]
+            return []
         if action is ActionType.Apply:
             used, results = command.item.apply(self)
             if used:
                 self.inventory.remove(command.item)
             return results
-        return [{'time': 0}]
+        return []
 
     def pickup(self, game_map):
         if len(self.inventory) >= 26:
-            return [{'time': 0}, {'message': 'Inventory full.'}]
+            return [{'message': 'Inventory full.'}]
         item = game_map.item_at(self.pos)
         if not item:
-            return [{'time': 0}]
+            return []
         self.inventory.append(item)
         game_map.items.remove(item)
         return [{'message': '{} {} up {}.'.format(self.name().capitalize(),
@@ -127,9 +127,9 @@ class Actor:
 
     def move_to(self, map, pos):
         if not map.is_passable(pos):
-            return [{'time': 0}]
+            return []
         if map.actor_at(pos):
-            return [{'time': 0}]
+            return []
         x, y = self.pos
         self.pos = pos
         if self.is_active_player:
