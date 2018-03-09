@@ -52,6 +52,8 @@ class AI:
 
 class SimpleMonsterAI(AI):
     def next_move(self, **kwargs):
+        if not self.owner.alive:
+            return Command(None)
         target = kwargs.get('target')
         game_map = kwargs.get('game_map')
         pos = self.owner.pos
@@ -66,7 +68,7 @@ class SimpleMonsterAI(AI):
 
 class PlayerAI(AI):
     def next_move(self, **kwargs):
-        action = handle_key(kwargs.get('key'))
+        action = handle_key(tcod.console_wait_for_keypress(True))
         prompt = None
         if action is ActionType.Describe:
             prompt = 'Describe what?'

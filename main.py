@@ -19,14 +19,17 @@ def init_game():
     return turn_state, game_map, map_knowledge
 
 
-def process_results(results, game_map, message_log, current_turn):
+def process_results(results, actor, game_map, message_log, current_turn):
     time_taken = 0
-    exit = False
+    end_game = False
+    # would be lovely if we had rust enums
     for result in results:
+        if result.get('player_only') and not actor.is_active_player:
+            continue
         if result.get('time'):
-            time_taken = result.get('time', 0)
+            time_taken = result.get('time')
         if result.get('exit'):
-            exit = result.get('exit')
+            end_game = result.get('exit')
         if result.get('message'):
             message_log.add(result.get('message'), current_turn)
         dead = result.get('dead')
@@ -34,38 +37,9 @@ def process_results(results, game_map, message_log, current_turn):
             message_log.add(dead.die(), current_turn)
             game_map.actors.remove(dead)
             if dead.kind == 'player':
-                exit = True
+                end_game = True
 
-    return time_taken, exit
-
-
-def do_turn(game_map, message_log, turn_state):
-    end_game = False
-
-    key = tcod.console_wait_for_keypress(True)
-
-    turn_state.progress = TurnProgress.Ongoing
-
-    player = game_map.get_active_player()
-    command = player.ai.next_move(key=key)
-
-    results = player.execute(command, game_map)
-    time_taken, exit = process_results(results, game_map, message_log, turn_state.current_turn)
-    end_game |= exit
-    if end_game or time_taken == 0:
-        return end_game
-
-    for actor in game_map.actors.copy():
-        if actor is player:
-            continue
-        command = actor.ai.next_move(target=player, game_map=game_map)
-        results = actor.execute(command, game_map)
-        results = [result for result in results if not result.get('player_only')]
-        time_taken, exit = process_results(results, game_map, message_log, turn_state.current_turn)
-        end_game |= exit
-
-    turn_state.next_turn()
-
+    actor.energy -= time_taken
     return end_game
 
 
@@ -86,8 +60,26 @@ def main():
 
         render_all(map_knowledge, game_map.los_map, game_map.get_active_player(), message_log, turn_state)
 
-        if do_turn(game_map, message_log, turn_state):
-            return True
+        turn_state.progress = TurnProgress.Ongoing
+
+        for actor in game_map.actors:
+            actor.energy += 100
+
+        active_actors = [actor for actor in game_map.actors if actor.energy > 0]
+        while len(active_actors) != 0:
+            # sort to always let the player go first
+            active_actors.sort(key=lambda act: 0 if act.is_active_player else 1)
+            for actor in active_actors:
+                command = actor.ai.next_move(target=game_map.get_active_player(), game_map=game_map)
+                results = actor.execute(command, game_map)
+                end_game = process_results(results, actor, game_map, message_log, turn_state.current_turn)
+                if end_game:
+                    return True
+
+            # if only python had do-while
+            active_actors = [actor for actor in game_map.actors if actor.energy > 0]
+
+        turn_state.next_turn()
 
 
 if __name__ == '__main__':

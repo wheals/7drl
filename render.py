@@ -58,10 +58,11 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     tcod.console_set_default_foreground(panel, old_fg)
 
 
-def render_ui(con, player):
+def render_ui(con, player, turn_state):
     tcod.console_set_default_foreground(con, tcod.white)
     render_bar(con, MAX_MAP_WIDTH + 1, 2, SCREEN_WIDTH - MAX_MAP_WIDTH - 2, 'HP', player.hp, player.max_hp,
                tcod.dark_green, tcod.red)
+    tcod.console_print(con, MAX_MAP_WIDTH + 1, 1, 'Turn: {}'.format(turn_state.current_turn))
 
     tcod.console_hline(con, 0, MAX_MAP_HEIGHT, MAX_MAP_WIDTH)
     tcod.console_vline(con, MAX_MAP_WIDTH, 0, tcod.console_get_height(con))
@@ -77,6 +78,8 @@ def render_messages(con, message_log, turn_state):
     row = 0
     current_turn = turn_state.current_turn
     for message, turn in message_log.messages:
+        # Show the last turn's messages as white until you make another action, and the current turn's messages (which
+        # will show up in the case of zero-time actions) as white on this turn too
         current = turn == current_turn - 1 or turn == current_turn and turn_state.progress is TurnProgress.Ongoing
         tcod.console_set_default_foreground(con, tcod.white if current else tcod.grey)
         tcod.console_print(con, 0, MAX_MAP_HEIGHT + 1 + row, message)
@@ -89,7 +92,7 @@ def render_all(map_knowledge, los_map, player, message_log, turn_state):
     tcod.console_clear(console)
 
     render_map(console, map_knowledge, los_map)
-    render_ui(console, player)
+    render_ui(console, player, turn_state)
     render_messages(console, message_log, turn_state)
 
     tcod.console_blit(console, 0, 0, tcod.console_get_width(console), tcod.console_get_height(console), 0, 0, 0)

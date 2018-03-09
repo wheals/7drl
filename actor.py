@@ -36,6 +36,7 @@ class Actor:
         self.id = next_actor_id
         next_actor_id += 1
         self.inventory = []
+        self.energy = 0
 
     def name(self):
         if self.kind == 'player':
