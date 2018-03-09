@@ -57,16 +57,14 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     tcod.console_set_default_foreground(panel, old_fg)
 
 
-def render_ui(con, player, message_log):
+def render_ui(con, player):
     tcod.console_set_default_foreground(con, tcod.white)
     render_bar(con, MAX_MAP_WIDTH + 1, 2, SCREEN_WIDTH - MAX_MAP_WIDTH - 2, 'HP', player.hp, player.max_hp,
                tcod.dark_green, tcod.red)
+
     tcod.console_hline(con, 0, MAX_MAP_HEIGHT, MAX_MAP_WIDTH)
     tcod.console_vline(con, MAX_MAP_WIDTH, 0, tcod.console_get_height(con))
-    row = 0
-    for message in message_log.messages:
-        tcod.console_print(con, 0, MAX_MAP_HEIGHT + 1 + row, message)
-        row += 1
+
     row = 0
     tcod.console_print(con, MAX_MAP_WIDTH + 1, 5, 'Inventory:')
     for item in player.inventory:
@@ -74,12 +72,22 @@ def render_ui(con, player, message_log):
         row += 1
 
 
-def render_all(map_knowledge, los_map, player, message_log):
+def render_messages(con, message_log, current_turn):
+    row = 0
+    for message, turn in message_log.messages:
+        tcod.console_set_default_foreground(con, tcod.white if turn == current_turn - 1 else tcod.grey)
+        tcod.console_print(con, 0, MAX_MAP_HEIGHT + 1 + row, message)
+        row += 1
+    tcod.console_set_default_foreground(con, tcod.white)
+
+
+def render_all(map_knowledge, los_map, player, message_log, current_turn):
     global console
     tcod.console_clear(console)
 
     render_map(console, map_knowledge, los_map)
-    render_ui(console, player, message_log)
+    render_ui(console, player)
+    render_messages(console, message_log, current_turn)
 
     tcod.console_blit(console, 0, 0, tcod.console_get_width(console), tcod.console_get_height(console), 0, 0, 0)
     tcod.console_flush()

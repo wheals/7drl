@@ -7,7 +7,7 @@ class MessageLog:
         self.width = width
         self.height = height
 
-    def add(self, message):
+    def add(self, message, turn):
         # Split the message if necessary, among multiple lines
         new_msg_lines = textwrap.wrap(message, self.width)
 
@@ -17,4 +17,4 @@ class MessageLog:
                 del self.messages[0]
 
             # Add the new line as a Message object, with the text and the color
-            self.messages.append(message)
+            self.messages.append((message, turn))

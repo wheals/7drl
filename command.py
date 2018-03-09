@@ -25,9 +25,6 @@ class ActionType(Enum):
     Apply = auto()
     Exit = auto()
 
-def takes_time(action):
-    return action is not ActionType.Quit
-
 
 command_keys = {
     tcod.KEY_UP: ActionType.MoveUp,
