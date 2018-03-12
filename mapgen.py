@@ -138,7 +138,7 @@ def place_monsters(game_map, rooms):
         occupied_spots = [actor.pos for actor in game_map.actors]
         valid_spots = [(x, y) for x in range(rooms[i].x1 + 1, rooms[i].x2) for y in range(rooms[i].y1 + 1, rooms[i].y2)
                        if (x, y) not in occupied_spots]
-        game_map.actors.append(Actor('human', valid_spots[randrange(0, len(valid_spots))]))
+        game_map.actors.append(Actor('human weakling', valid_spots[randrange(0, len(valid_spots))]))
 
 
 def total_items(rooms):

@@ -7,7 +7,7 @@ import libtcodpy as tcod
 class Command:
     def __init__(self, action, item=None):
         self.action = action
-        self.item = item # item do do it with, if any
+        self.item = item  # item to do it with, if any
 
 
 class ActionType(Enum):

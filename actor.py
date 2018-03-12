@@ -140,7 +140,7 @@ class Actor:
     def display_char(self):
         if self.kind == 'player':
             return DisplayChar('@', tcod.white)
-        elif self.kind == 'human':
-            return DisplayChar('h', tcod.light_cyan)
+        elif self.kind == 'human weakling':
+            return DisplayChar('w', tcod.light_cyan)
         else:
             return DisplayChar('?', tcod.magenta)

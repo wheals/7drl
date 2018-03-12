@@ -9,7 +9,7 @@ from messages import MessageLog
 from turnstate import TurnProgress
 
 
-SCREEN_WIDTH = 135
+SCREEN_WIDTH = 125
 SCREEN_HEIGHT = 50
 
 console = None
